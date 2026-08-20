@@ -7,7 +7,7 @@ import { fechaISO } from '../lib/pendulo.js';
 
 const CARPETAS = [
   { key: 'oficiales', titulo: 'Oficiales', desc: 'Nombre de la materia + fecha del péndulo', color: 'emerald' },
-  { key: 'coincidentes', titulo: 'Coincidentes', desc: 'Sin nombre de materia, pero fecha del péndulo', color: 'sky' },
+  { key: 'coincidentes', titulo: 'Coincidentes', desc: 'Sin nombre de materia, fecha y hora de esa sesión', color: 'sky' },
   { key: 'alterna', titulo: 'Alterna', desc: 'Fecha distinta pero dentro del rango del grupo, hora habitual', color: 'amber' },
   { key: 'extra', titulo: 'Extra', desc: 'Fuera del rango del grupo, u hora que no coincide', color: 'rose' },
 ];
