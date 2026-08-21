@@ -1,7 +1,7 @@
 import { normalizar } from './normalizar.js';
 import { generarSesiones, horasDelPatron, diferenciaMinutos, fechaISO, dentroDeBufferPendulo } from './pendulo.js';
 
-const TOLERANCIA_MINUTOS = 30;
+const TOLERANCIA_MINUTOS = 15;
 
 /**
  * Clasifica las grabaciones de un tutor (filas de grabaciones_calendario_pilot,
@@ -12,15 +12,15 @@ const TOLERANCIA_MINUTOS = 30;
  *                    una sesion real del pendulo (ya ajustada por festivo).
  *  - COINCIDENTES:  titulo NO tiene el nombre de la materia, la fecha SI es
  *                    una sesion real del pendulo, Y la hora esta dentro de
- *                    tolerancia (+/-30min) de la hora habitual de ESA sesion
- *                    puntual (no de cualquier hora del patron general -- un
- *                    grupo "MJ 6pm S 8am" que tiene sesion el sabado a las
- *                    8am no cuenta como coincidente si la grabacion es ese
- *                    mismo sabado pero a las 6pm).
+ *                    tolerancia (+/-15min, ver TOLERANCIA_MINUTOS) de la hora
+ *                    habitual de ESA sesion puntual (no de cualquier hora
+ *                    del patron general -- un grupo "MJ 6pm S 8am" que tiene
+ *                    sesion el sabado a las 8am no cuenta como coincidente
+ *                    si la grabacion es ese mismo sabado pero a las 6pm).
  *  - ALTERNA:       titulo NO tiene el nombre de la materia, Y (la fecha NO
  *                    es sesion del pendulo, O si lo es la hora no coincidio
  *                    con esa sesion puntual), PERO cae DENTRO del rango del
- *                    grupo (apertura->cierre) Y la hora coincide (+/-30min)
+ *                    grupo (apertura->cierre) Y la hora coincide (+/-15min)
  *                    con alguna de las horas habituales del horario en
  *                    general (no necesariamente la de ese dia puntual --
  *                    ej. jueves a las 6pm en un grupo LMV 6pm).
