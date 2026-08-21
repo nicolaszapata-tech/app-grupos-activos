@@ -30,6 +30,22 @@ export function formatearHora12(hora) {
   return `${h}:${m} ${ampm}`;
 }
 
+/** Timestamp ISO (con hora) -> "hace 5 min" / "hace 3 h" / "hace 2 d", o la
+ *  fecha+hora larga si pasaron más de 7 días. null/undefined -> "nunca". */
+export function formatearHaceTiempo(isoConHora) {
+  if (!isoConHora) return 'nunca';
+  const entonces = new Date(isoConHora);
+  const diffMs = Date.now() - entonces.getTime();
+  const diffMin = Math.round(diffMs / 60000);
+  if (diffMin < 1) return 'justo ahora';
+  if (diffMin < 60) return `hace ${diffMin} min`;
+  const diffH = Math.round(diffMin / 60);
+  if (diffH < 24) return `hace ${diffH} h`;
+  const diffD = Math.round(diffH / 24);
+  if (diffD < 7) return `hace ${diffD} d`;
+  return entonces.toLocaleString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 export function hoyISO() {
   const d = new Date();
   const y = d.getFullYear();

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { fetchTodosGrupos, filtrarGruposActivos } from '../lib/data.js';
 import { formatearDDMMYYYY, hoyISO } from '../lib/formato.js';
 import { normalizar } from '../lib/normalizar.js';
+import PanelSincronizacion from '../components/PanelSincronizacion.jsx';
 
 export default function GruposActivos() {
   const [grupos, setGrupos] = useState(null);
@@ -64,6 +65,8 @@ export default function GruposActivos() {
             : 'Por defecto: grupos activos hoy. Selecciona una fecha para ver solo los que iniciaron ese día.'}
         </p>
       </div>
+
+      <PanelSincronizacion />
 
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6 bg-ink-900 border border-ink-700 rounded-lg p-4">
         <Filtro label="Fecha de inicio">
