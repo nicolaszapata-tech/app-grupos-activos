@@ -4,6 +4,7 @@ import { fetchTodosGrupos, filtrarGruposActivos } from '../lib/data.js';
 import { formatearDDMMYYYY, hoyISO } from '../lib/formato.js';
 import { normalizar } from '../lib/normalizar.js';
 import PanelSincronizacion from '../components/PanelSincronizacion.jsx';
+import Combobox from '../components/Combobox.jsx';
 
 export default function GruposActivos() {
   const [grupos, setGrupos] = useState(null);
@@ -11,8 +12,9 @@ export default function GruposActivos() {
 
   const [fechaInicioFiltro, setFechaInicioFiltro] = useState(null);
   const [categoria, setCategoria] = useState('TODAS');
-  const [tutor, setTutor] = useState('TODOS');
-  const [busquedaMateria, setBusquedaMateria] = useState('');
+  const [groupIdFiltro, setGroupIdFiltro] = useState('');
+  const [tutorFiltro, setTutorFiltro] = useState('');
+  const [materiaFiltro, setMateriaFiltro] = useState('');
 
   useEffect(() => {
     fetchTodosGrupos()
@@ -30,6 +32,11 @@ export default function GruposActivos() {
     return Array.from(new Set(grupos.map((g) => g.tutor_calendario).filter(Boolean))).sort();
   }, [grupos]);
 
+  const materias = useMemo(() => {
+    if (!grupos) return [];
+    return Array.from(new Set(grupos.map((g) => g.materia || g.subject_name).filter(Boolean))).sort();
+  }, [grupos]);
+
   const filtrados = useMemo(() => {
     if (!grupos) return [];
     let lista;
@@ -39,13 +46,20 @@ export default function GruposActivos() {
       lista = filtrarGruposActivos(grupos, new Date(hoyISO() + 'T00:00:00'));
     }
     if (categoria !== 'TODAS') lista = lista.filter((g) => g.categoria_programa === categoria);
-    if (tutor !== 'TODOS') lista = lista.filter((g) => g.tutor_calendario === tutor);
-    if (busquedaMateria.trim()) {
-      const q = normalizar(busquedaMateria);
+    if (groupIdFiltro.trim()) {
+      const q = groupIdFiltro.trim().toLowerCase();
+      lista = lista.filter((g) => (g.group_id || '').toLowerCase().includes(q));
+    }
+    if (tutorFiltro.trim()) {
+      const q = normalizar(tutorFiltro);
+      lista = lista.filter((g) => normalizar(g.tutor_calendario || '').includes(q));
+    }
+    if (materiaFiltro.trim()) {
+      const q = normalizar(materiaFiltro);
       lista = lista.filter((g) => normalizar(g.materia || g.subject_name || '').includes(q));
     }
     return lista;
-  }, [grupos, fechaInicioFiltro, categoria, tutor, busquedaMateria]);
+  }, [grupos, fechaInicioFiltro, categoria, groupIdFiltro, tutorFiltro, materiaFiltro]);
 
   if (errorCarga) {
     return (
@@ -68,14 +82,14 @@ export default function GruposActivos() {
 
       <PanelSincronizacion />
 
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6 bg-ink-900 border border-ink-700 rounded-lg p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6 bg-ink-900 border border-ink-700 rounded-lg p-4">
         <Filtro label="Fecha de inicio">
           <div className="relative">
             <input
               type="date"
               value={fechaInicioFiltro || ''}
               onChange={(e) => setFechaInicioFiltro(e.target.value || null)}
-              className="w-full bg-ink-800 border border-ink-600 rounded-md px-3 py-2 pr-8 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent-500"
+              className="w-full bg-ink-800 border border-ink-600 rounded-full px-3 py-2 pr-8 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
             />
             {fechaInicioFiltro && (
               <button
@@ -83,7 +97,7 @@ export default function GruposActivos() {
                 onClick={() => setFechaInicioFiltro(null)}
                 title="Quitar filtro de fecha (volver a activos hoy)"
                 aria-label="Quitar filtro de fecha"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded text-slate-400 hover:text-slate-100 hover:bg-ink-700"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-100 hover:bg-ink-700"
               >
                 ×
               </button>
@@ -94,7 +108,7 @@ export default function GruposActivos() {
           <select
             value={categoria}
             onChange={(e) => setCategoria(e.target.value)}
-            className="w-full bg-ink-800 border border-ink-600 rounded-md px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent-500"
+            className="w-full bg-ink-800 border border-ink-600 rounded-full px-3.5 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
           >
             <option value="TODAS">Todas</option>
             {categorias.map((c) => (
@@ -102,25 +116,28 @@ export default function GruposActivos() {
             ))}
           </select>
         </Filtro>
+        <Filtro label="Group ID">
+          <Combobox
+            value={groupIdFiltro}
+            onChange={setGroupIdFiltro}
+            options={[]}
+            placeholder="Buscar Group ID..."
+          />
+        </Filtro>
         <Filtro label="Tutor calendario">
-          <select
-            value={tutor}
-            onChange={(e) => setTutor(e.target.value)}
-            className="w-full bg-ink-800 border border-ink-600 rounded-md px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent-500"
-          >
-            <option value="TODOS">Todos</option>
-            {tutores.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+          <Combobox
+            value={tutorFiltro}
+            onChange={setTutorFiltro}
+            options={tutores}
+            placeholder="Escribir o elegir tutor..."
+          />
         </Filtro>
         <Filtro label="Materia">
-          <input
-            type="text"
-            placeholder="Buscar materia..."
-            value={busquedaMateria}
-            onChange={(e) => setBusquedaMateria(e.target.value)}
-            className="w-full bg-ink-800 border border-ink-600 rounded-md px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-500"
+          <Combobox
+            value={materiaFiltro}
+            onChange={setMateriaFiltro}
+            options={materias}
+            placeholder="Escribir o elegir materia..."
           />
         </Filtro>
       </div>
