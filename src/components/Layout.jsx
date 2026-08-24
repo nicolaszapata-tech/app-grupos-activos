@@ -16,12 +16,6 @@ export default function Layout({ children, sesion, onCerrarSesion }) {
           </Link>
           {sesion && (
             <div className="flex items-center gap-3">
-              <Link
-                to="/evaluacion-docente"
-                className="text-xs text-slate-400 hover:text-slate-100 border border-ink-600 rounded-md px-2.5 py-1.5 hover:bg-ink-800 transition-colors"
-              >
-                Evaluación Docente
-              </Link>
               <span className="text-xs text-slate-400 hidden sm:inline">{sesion.email}</span>
               <button
                 type="button"
