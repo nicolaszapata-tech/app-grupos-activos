@@ -37,11 +37,21 @@ export default function GruposActivos() {
     return Array.from(new Set(grupos.map((g) => g.materia || g.subject_name).filter(Boolean))).sort();
   }, [grupos]);
 
+  const hayFiltroEspecifico = !!(groupIdFiltro.trim() || tutorFiltro.trim() || materiaFiltro.trim());
+
   const filtrados = useMemo(() => {
     if (!grupos) return [];
     let lista;
     if (fechaInicioFiltro) {
       lista = grupos.filter((g) => g.aperturaIso === fechaInicioFiltro);
+    } else if (hayFiltroEspecifico) {
+      // Buscar por Group ID/Tutor/Materia es una búsqueda puntual -- no debe
+      // quedar oculta por la ventana de "activos hoy" (2026-08-25, bug
+      // reportado: una materia que sí existe en la data, pero cuyo grupo ya
+      // no está activo hoy, daba "No hay grupos activos con estos filtros"
+      // aunque el combobox la mostrara como opción -- el combobox lista TODOS
+      // los grupos, no solo los de hoy).
+      lista = grupos;
     } else {
       lista = filtrarGruposActivos(grupos, new Date(hoyISO() + 'T00:00:00'));
     }
@@ -59,7 +69,7 @@ export default function GruposActivos() {
       lista = lista.filter((g) => normalizar(g.materia || g.subject_name || '').includes(q));
     }
     return lista;
-  }, [grupos, fechaInicioFiltro, categoria, groupIdFiltro, tutorFiltro, materiaFiltro]);
+  }, [grupos, fechaInicioFiltro, categoria, groupIdFiltro, tutorFiltro, materiaFiltro, hayFiltroEspecifico]);
 
   if (errorCarga) {
     return (
@@ -76,7 +86,9 @@ export default function GruposActivos() {
         <p className="text-sm text-slate-400 mt-1">
           {fechaInicioFiltro
             ? `Grupos que iniciaron el ${formatearDDMMYYYY(fechaInicioFiltro)}.`
-            : 'Por defecto: grupos activos hoy. Selecciona una fecha para ver solo los que iniciaron ese día.'}
+            : hayFiltroEspecifico
+              ? 'Buscando por Group ID / Tutor / Materia en todos los grupos (no solo los activos hoy).'
+              : 'Por defecto: grupos activos hoy. Selecciona una fecha para ver solo los que iniciaron ese día.'}
         </p>
       </div>
 
@@ -147,7 +159,7 @@ export default function GruposActivos() {
       ) : (
         <>
           <div className="text-xs text-slate-400 mb-2">
-            {filtrados.length} grupo(s) {fechaInicioFiltro ? 'iniciado(s) esa fecha' : 'activo(s) hoy'}
+            {filtrados.length} grupo(s) {fechaInicioFiltro ? 'iniciado(s) esa fecha' : hayFiltroEspecifico ? 'encontrado(s)' : 'activo(s) hoy'}
           </div>
           <div className="rounded-lg border border-ink-700">
             <table className="w-full text-sm table-fixed">
@@ -204,7 +216,7 @@ export default function GruposActivos() {
                 {filtrados.length === 0 && (
                   <tr>
                     <td colSpan={10} className="text-center text-slate-500 py-8 text-sm">
-                      No hay grupos activos con estos filtros.
+                      No hay grupos con estos filtros.
                     </td>
                   </tr>
                 )}
