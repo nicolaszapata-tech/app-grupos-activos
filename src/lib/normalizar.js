@@ -9,11 +9,11 @@ export function normalizar(texto) {
     .replace(/\s+/g, ' ');
 }
 
-/** Empareja el nombre de tutor de programacion_grupos (tutor_calendario)
- *  contra el catalogo tutores_grabaciones: exacto normalizado primero, si no
+/** Empareja el nombre de tutor de grab_programacion_grupos (tutor_calendario)
+ *  contra el catalogo grab_tutores: exacto normalizado primero, si no
  *  hay match cae a subconjunto de tokens (mismo criterio que
  *  nombresDocenteCoinciden_ en 06_Cruce_Rutas.gs / buscar_grabaciones_tutor
- *  en app.py). Devuelve el registro de tutores_grabaciones o null. */
+ *  en app.py). Devuelve el registro de grab_tutores o null. */
 export function emparejarTutor(nombreCalendario, catalogoTutores) {
   const objetivo = normalizar(nombreCalendario);
   if (!objetivo) return null;

@@ -4,7 +4,7 @@ import { generarSesiones, horasDelPatron, diferenciaMinutos, fechaISO, dentroDeB
 const TOLERANCIA_MINUTOS = 15;
 
 /**
- * Clasifica las grabaciones de un tutor (filas de grabaciones_calendario_pilot,
+ * Clasifica las grabaciones de un tutor (filas de grab_calendario_pilot,
  * ya filtradas por tutor_id) contra el pendulo real de un grupo, en las 4
  * carpetas que definio el usuario (ajustado 2026-08-20d):
  *

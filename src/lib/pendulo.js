@@ -1,9 +1,9 @@
 /**
  * Sistema de pendulos: mismo criterio que MACROS HE/08_Modulo_Grabaciones.gs
  * y APP_GRABACIONES/pendulo.py -- rango apertura-cierre (Fecha calendario
- * Inicio/Fin de programacion_grupos) + patron de dias segun el texto exacto
+ * Inicio/Fin de grab_programacion_grupos) + patron de dias segun el texto exacto
  * de Horario, corriendo al siguiente dia si cae festivo (usando
- * calendario_dias_habiles), y repitiendo el corrimiento si el dia siguiente
+ * cal_dias_habiles), y repitiendo el corrimiento si el dia siguiente
  * tambien es festivo (festivos seguidos).
  *
  * A diferencia del .gs (que solo guarda el patron de dias), aca cada dia

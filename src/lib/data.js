@@ -2,13 +2,13 @@ import { supabase } from './supabase.js';
 import { parsearFechaISO, fechaISO } from './pendulo.js';
 import { emparejarTutor } from './normalizar.js';
 
-/** Todos los grupos de programacion_grupos, con las fechas ya parseadas a
+/** Todos los grupos de grab_programacion_grupos, con las fechas ya parseadas a
  *  Date y la fecha "efectiva" de apertura/cierre resuelta (prioriza
  *  calendario, cae a plataforma -- mismo criterio que resolverFechaPendulo_
  *  en 08_Modulo_Grabaciones.gs). */
 export async function fetchTodosGrupos() {
   const { data, error } = await supabase
-    .from('programacion_grupos')
+    .from('grab_programacion_grupos')
     .select('*')
     .order('fecha_calendario_inicio', { ascending: true })
     .order('id_grupo_mapeo', { ascending: true });
@@ -33,10 +33,10 @@ export function filtrarGruposActivos(grupos, fecha) {
   return grupos.filter((g) => g.aperturaIso && g.cierreIso && g.aperturaIso <= iso && g.cierreIso >= iso);
 }
 
-/** Mapa "yyyy-mm-dd" -> true si es FESTIVO (de calendario_dias_habiles). */
+/** Mapa "yyyy-mm-dd" -> true si es FESTIVO (de cal_dias_habiles). */
 export async function fetchMapaFestivos() {
   const { data, error } = await supabase
-    .from('calendario_dias_habiles')
+    .from('cal_dias_habiles')
     .select('fecha, habil_o_festivo');
   if (error) throw error;
 
@@ -49,7 +49,7 @@ export async function fetchMapaFestivos() {
 
 export async function fetchTutoresGrabaciones() {
   const { data, error } = await supabase
-    .from('tutores_grabaciones')
+    .from('grab_tutores')
     .select('*')
     .eq('activo', true);
   if (error) throw error;
@@ -59,7 +59,7 @@ export async function fetchTutoresGrabaciones() {
 export async function fetchGrabacionesPorTutor(tutorId) {
   if (!tutorId) return [];
   const { data, error } = await supabase
-    .from('grabaciones_calendario_pilot')
+    .from('grab_calendario_pilot')
     .select('*')
     .eq('tutor_id', tutorId)
     .order('fecha', { ascending: true });
@@ -68,7 +68,7 @@ export async function fetchGrabacionesPorTutor(tutorId) {
 }
 
 /** Busca el grupo por id_grupo_mapeo y resuelve su tutor de grabaciones vía
- *  tutor_calendario -> tutores_grabaciones (match exacto o por tokens). */
+ *  tutor_calendario -> grab_tutores (match exacto o por tokens). */
 export async function fetchGrupoConTutor(idGrupoMapeo) {
   const [grupos, tutores] = await Promise.all([fetchTodosGrupos(), fetchTutoresGrabaciones()]);
   const grupo = grupos.find((g) => g.id_grupo_mapeo === idGrupoMapeo);
